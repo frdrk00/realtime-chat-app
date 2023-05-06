@@ -1,10 +1,12 @@
 import FriendRequestSidebarOption from "@/components/FriendRequestSidebarOption";
 import { Icon, Icons } from "@/components/Icons";
+import MobileChatLayout from "@/components/MobileChatLayout";
 import SidebarChatList from "@/components/SidebarChatList";
 import SignOutButton from "@/components/SignOutButton";
 import { getFriendsByUserId } from "@/helpers/get-friends-by-user-id";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
+import { SidebarOption } from "@/types/typings";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,13 +15,6 @@ import { ReactNode } from "react";
 
 interface LayoutProps {
   children: ReactNode;
-}
-
-interface SidebarOption {
-  id: number;
-  name: string;
-  href: string;
-  Icon: Icon;
 }
 
 const sidebarOptions: SidebarOption[] = [
@@ -46,7 +41,16 @@ const Layout = async ({ children }: LayoutProps) => {
 
   return (
     <div className="w-full flex h-screen">
-      <div className="flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
+      <div className="md:hidden">
+        <MobileChatLayout
+          friends={friends}
+          session={session}
+          sidebarOptions={sidebarOptions}
+          unseenRequestCount={unseenRequestCount}
+        />
+      </div>
+
+      <div className="hidden md:flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
         <Link href="/dashboard" className="flex h-16 shrink-0 items-center">
           {<Icons.Logo className="h-8 w-auto text-indigo-600" />}
         </Link>
@@ -59,7 +63,6 @@ const Layout = async ({ children }: LayoutProps) => {
 
         <nav className="flex flex-1 flex-col">
           <ul role="list" className="flex flex-1 flex-col gap-y-7">
-
             <li>
               <SidebarChatList sessionId={session.user.id} friends={friends} />
             </li>
@@ -69,7 +72,6 @@ const Layout = async ({ children }: LayoutProps) => {
                 Overview
               </div>
               <ul role="list" className="-mx-2 mt-2 space-y-1">
-
                 {sidebarOptions.map((option) => {
                   const Icon = Icons[option.Icon];
                   return (
@@ -88,13 +90,12 @@ const Layout = async ({ children }: LayoutProps) => {
                   );
                 })}
 
-            <li>
-              <FriendRequestSidebarOption
-                sessionId={session.user.id}
-                initialUnseenRequestCount={unseenRequestCount}
-              />
-            </li>
-
+                <li>
+                  <FriendRequestSidebarOption
+                    sessionId={session.user.id}
+                    initialUnseenRequestCount={unseenRequestCount}
+                  />
+                </li>
               </ul>
             </li>
 
@@ -125,7 +126,9 @@ const Layout = async ({ children }: LayoutProps) => {
         </nav>
       </div>
 
-      <aside className="max-h-screen container py-16 md:py-12 w-full">{children}</aside>
+      <aside className="max-h-screen container py-16 md:py-12 w-full">
+        {children}
+      </aside>
     </div>
   );
 };
