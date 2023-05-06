@@ -34,12 +34,16 @@ const FriendRequestSidebarOption: FC<FriendRequestSidebarOptionProps> = ({
     };
 
     pusherClient.bind("incoming_friend_requests", friendRequestHandler);
+    pusherClient.bind("new_friend", addedFriendHandler);
 
     return () => {
       pusherClient.unsubscribe(
         toPusherKey(`user:${sessionId}:incoming_friend_requests`)
       );
       pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`));
+
+      pusherClient.unbind("new_friend", addedFriendHandler);
+      pusherClient.unbind("incoming_friend_requests", friendRequestHandler);
     };
   }, [sessionId]);
 

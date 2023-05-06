@@ -6,7 +6,7 @@ const page = async () => {
 
   const session = await getServerSession(authOptions)
   
-  return <div>Dash</div>
+  return <div>Dashboard</div>
 }
 
 export default page
